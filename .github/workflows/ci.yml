@@ -63,7 +63,7 @@ jobs:
           xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -sdk iphoneos build CODE_SIGNING_ALLOWED=NO
 
       - name: Archive artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ios-release
-          path: build/ios/Release-iphoneos/Runner.app # Adjust the path according to your project structure
+          path: build/ios/Release-iphoneos/Runner.app
