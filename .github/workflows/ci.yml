@@ -22,14 +22,18 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter build apk --release --split-per-abi
-      - run: |
+
+      - name: Build iOS
+        run: |
           flutter build ios --release --no-codesign
-          cd build/ios/iphoneos
-          mkdir Payload
-          cd Payload
-          ln -s ../Runner.app
-          cd ..
-          zip -r app.ipa Payload
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -sdk iphoneos build CODE_SIGNING_ALLOWED=NO
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios-release
+          path: ios/build/Release-iphoneos/Runner.app # Adjust the path according to your project structure
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
