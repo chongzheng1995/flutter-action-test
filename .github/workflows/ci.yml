@@ -7,21 +7,46 @@ on:
     branches: [ "main", "master", "develop" ]
 
 jobs:
-  build:
-    name: Build and Release
+  build_android:
+    name: Build Android Release
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v2
-        with:
-          distribution: 'zulu'
-          java-version: '11'
 
-      - uses: subosito/flutter-action@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-      - run: flutter pub get
-      - run: flutter build apk --release --split-per-abi
+          flutter-version: '2.x' # Specify your Flutter version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  build_ios:
+    name: Build iOS Release
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '2.x' # Specify your Flutter version
+
+      - name: Install dependencies
+        run: flutter pub get
 
       - name: Build iOS
         run: |
@@ -34,10 +59,3 @@ jobs:
         with:
           name: ios-release
           path: ios/build/Release-iphoneos/Runner.app # Adjust the path according to your project structure
-
-      - name: Push to Releases
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "build/app/outputs/apk/release/*,build/ios/iphoneos/app.ipa"
-          tag: v1.0.${{ github.run_number }}
-          token: ${{ secrets.TOKEN }}
