@@ -7,30 +7,37 @@ on:
     branches: [ "main", "master", "develop" ]
 
 jobs:
-  build_android:
-    name: Build Android Release
-    runs-on: ubuntu-latest
+  # build_android:
+  #   name: Build Android Release
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '2.x' # Specify your Flutter version
+  #     - name: Setup Java
+  #       uses: actions/setup-java@v2
+  #       with:
+  #         distribution: 'zulu'
+  #         java-version: '11'
 
-      - name: Install dependencies
-        run: flutter pub get
+  #     - name: Setup Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         channel: 'stable'
+  #         flutter-version: '3.19.6'
 
-      - name: Build APK
-        run: flutter build apk --release
+  #     - name: Install dependencies
+  #       run: flutter pub get
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v2
-        with:
-          name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+  #     - name: Build APK
+  #       run: flutter build apk --release
+
+  #     - name: Upload APK
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: app-release
+  #         path: build/app/outputs/flutter-apk/app-release.apk
 
   build_ios:
     name: Build iOS Release
@@ -44,6 +51,8 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: '3.19.6'
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -57,4 +66,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ios-release
-          path: ios/build/Release-iphoneos/Runner.app # Adjust the path according to your project structure
+          path: build/ios/Release-iphoneos/Runner.app # Adjust the path according to your project structure
