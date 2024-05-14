@@ -13,27 +13,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Read version from pubspec.yaml
         id: read_version
         run: |
-          VERSION=$(awk '/version:/{gsub(/"/,"",$2); print $2}' pubspec.yaml)
-          echo "Version: $VERSION"
-          echo "version={VERSION}" >> $GITHUB_OUTPUT
+          version=$(grep 'version:' pubspec.yaml | cut -d ' ' -f 2)
+          echo "version: $version"
 
-      - name: Get release branch name
-        id: get_branch_name
-        run: |
-          BRANCH_NAME=$(echo $GITHUB_REF | sed 's|.*/\(.*\)|\1|')
-          echo "Release Branch: $BRANCH_NAME"
-          echo "branch_name={BRANCH_NAME}" >> $GITHUB_OUTPUT
+          branch=$(git rev-parse --abbrev-ref HEAD)
+          echo "branch: $branch"
 
-      - name: Verify version
-        run: |
-          RELEASE_BRANCH=$(echo "${{ steps.get_branch_name.outputs.branch_name }}")
-          VERSION=$(echo "${{ steps.read_version.outputs.version }}")
-
-          if [[ "$RELEASE_BRANCH" == "$VERSION" ]]; then
+          if [[ "$branch" == "$version" ]]; then
             echo "Version in pubspec.yaml matches the release branch name."
           else
             echo "Error: Version in pubspec.yaml does not match the release branch name."
