@@ -7,13 +7,44 @@ on:
     branches: [ "main", "master", "develop" ]
 
 jobs:
+  tag:
+    name: Create tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tag version
+        id: tag-version
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+
+            const filePath = 'app/pubspec.yaml';
+            const fileContent = fs.readFileSync(filePath, 'utf-8');
+            const regexPattern = /version: "([0-9\.]{6}([-\+][\w\.0-9]+)?)"/;
+
+            const match = fileContent.match(regexPattern);
+            const versionName = match ? match[1] : null;
+            const prefixedVersionName = versionName ? `v${versionName}` : null;
+
+            if (prefixedVersionName == null) {
+              throw new Error('Version name not found in file: ' + filePath);
+            }
+            console.log('Version name: ' + prefixedVersionName);
+            return prefixedVersionName;
+
+      - name: Create tag
+        run: |
+          git tag ${{steps.tag-version.outputs.result}}
+          git push --tags
+
   # build_android:
   #   name: Build Android Release
   #   runs-on: ubuntu-latest
 
   #   steps:
   #     - name: Checkout code
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
 
   #     - name: Setup Java
   #       uses: actions/setup-java@v2
@@ -34,7 +65,7 @@ jobs:
   #       run: flutter build apk --release
 
   #     - name: Upload APK
-  #       uses: actions/upload-artifact@v2
+  #       uses: actions/upload-artifact@v4
   #       with:
   #         name: app-release
   #         path: build/app/outputs/flutter-apk/app-release.apk
@@ -42,6 +73,7 @@ jobs:
   build_ios:
     name: Build iOS Release
     runs-on: macos-latest
+    needs: [tag]
 
     steps:
       - name: Checkout code
