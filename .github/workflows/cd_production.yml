@@ -25,7 +25,7 @@ jobs:
         id: get_branch_name
         run: |
           BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print substr($0, index($0,$2"/"$3"/"))}')
-          echo "Release Branch: $RELEASE_BRANCH"
+          echo "Release Branch: $BRANCH_NAME"
           echo "branch_name={BRANCH_NAME}" >> $GITHUB_OUTPUT
 
       - name: Verify version
