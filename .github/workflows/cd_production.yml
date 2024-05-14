@@ -32,7 +32,7 @@ jobs:
             const yaml = require('js-yaml');
 
             const fileContent = fs.readFileSync('pubspec.yaml', 'utf-8');
-            const data = yaml.safeLoad(fileContent);
+            const data = yaml.load(fileContent);
 
             const version = `v${data.version}`;
 
