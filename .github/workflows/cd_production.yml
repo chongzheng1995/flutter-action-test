@@ -18,11 +18,15 @@ jobs:
         id: read_version
         run: |
           VERSION=$(awk '/version:/{gsub(/"/,"",$2); print $2}' pubspec.yaml)
-          echo "::set-output name=version::$VERSION"
+          console.log("version: " + VERSION)
+          echo "version={VERSION}" >> $GITHUB_OUTPUT
 
       - name: Get release branch name
         id: get_branch_name
-        run: echo "::set-output name=branch_name::$(echo $GITHUB_REF | awk -F'/' '{print $3}')"
+        run: |
+          BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print $3}')
+          console.log("branch_name: " + BRANCH_NAME)
+          echo "branch_name={BRANCH_NAME}" >> $GITHUB_OUTPUT
 
       - name: Verify version
         run: |
