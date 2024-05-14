@@ -21,22 +21,18 @@ jobs:
           result-encoding: string
           script: |
             const fs = require('fs');
+            const yaml = require('js-yaml');
 
-            const filePath = 'pubspec.yaml';
-            const fileContent = fs.readFileSync(filePath, 'utf-8');
-            const regexPattern = /version: "(\d+\.\d+\.\d+\s*(.*))?"/;
+            const fileContent = fs.readFileSync('pubspec.yaml', 'utf-8');
+            const data = yaml.safeLoad(fileContent);
 
-            const match = fileContent.match(regexPattern);
-            console.log('count: ' + match);
-            console.log('first match: ' + match[1]);
-            const versionName = match ? match[1] : null;
-            const prefixedVersionName = versionName ? `v${versionName}` : null;
+            const version = `v${data.version}`;
 
-            if (prefixedVersionName == null) {
+            if (version == null) {
               throw new Error('Version not found in file: ' + filePath);
             }
-            console.log('Version name: ' + prefixedVersionName);
-            return prefixedVersionName;
+            console.log('Version name: ' + version);
+            return version;
 
       - name: Create tag
         run: |
