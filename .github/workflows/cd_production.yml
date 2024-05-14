@@ -19,7 +19,7 @@ jobs:
           script: |
             const fs = require('fs');
 
-            const filePath = 'app/pubspec.yaml';
+            const filePath = 'pubspec.yaml';
             const fileContent = fs.readFileSync(filePath, 'utf-8');
             const regexPattern = /version: "([0-9\.]{6}([-\+][\w\.0-9]+)?)"/;
 
