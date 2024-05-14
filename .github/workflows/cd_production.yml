@@ -11,8 +11,8 @@ jobs:
     name: Create tag
     runs-on: ubuntu-latest
     steps:
-      - name: List directory contents
-        run: ls -la
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Get tag version
         id: tag-version
