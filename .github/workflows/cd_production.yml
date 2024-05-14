@@ -24,7 +24,7 @@ jobs:
       - name: Get release branch name
         id: get_branch_name
         run: |
-          BRANCH_NAME=$(echo $GITHUB_REF | awk -F'/' '{print substr($0, index($0,$2"/"$3"/"))}')
+          BRANCH_NAME=$(echo $GITHUB_REF | sed 's|.*/\(.*\)|\1|')
           echo "Release Branch: $BRANCH_NAME"
           echo "branch_name={BRANCH_NAME}" >> $GITHUB_OUTPUT
 
