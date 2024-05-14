@@ -1,0 +1,112 @@
+name: Flutter
+
+on:
+  push:
+    branches: [ "main", "release" ]
+  pull_request:
+    branches: [ "main", "master", "develop" ]
+
+jobs:
+  tag:
+    name: Create tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install npm dependencies
+        run: npm install js-yaml
+
+      - name: Get tag version
+        id: tag-version
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+
+            const fileContent = fs.readFileSync('pubspec.yaml', 'utf-8');
+            const data = yaml.load(fileContent);
+
+            const version = `v${data.version}`;
+
+            if (version == null) {
+              throw new Error('Version not found in file: ' + filePath);
+            }
+            console.log('Version name: ' + version);
+            return version;
+
+      - name: Create tag
+        run: |
+          git tag ${{steps.tag-version.outputs.result}}
+          git push --tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # build_android:
+  #   name: Build Android Release
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup Java
+  #       uses: actions/setup-java@v2
+  #       with:
+  #         distribution: 'zulu'
+  #         java-version: '11'
+
+  #     - name: Setup Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         channel: 'stable'
+  #         flutter-version: '3.19.6'
+
+  #     - name: Install dependencies
+  #       run: flutter pub get
+
+  #     - name: Build APK
+  #       run: flutter build apk --release
+
+  #     - name: Upload APK
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: app-release
+  #         path: build/app/outputs/flutter-apk/app-release.apk
+
+  build_ios:
+    name: Build iOS Release
+    runs-on: macos-latest
+    needs: [tag]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.19.6'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS
+        run: |
+          flutter build ios --release --no-codesign
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -sdk iphoneos build CODE_SIGNING_ALLOWED=NO
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release
+          path: build/ios/Release-iphoneos/Runner.app
