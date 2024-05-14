@@ -22,7 +22,7 @@ jobs:
           version=$(grep 'version:' pubspec.yaml | cut -d ' ' -f 2)
           echo "version: $version"
 
-          branch=$BRANCH_NAME
+          branch=$(echo "$BRANCH_NAME" | sed 's/^release\///')
           echo "branch: $branch"
 
           if [[ "$branch" == "$version" ]]; then
