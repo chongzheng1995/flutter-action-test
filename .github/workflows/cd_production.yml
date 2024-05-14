@@ -27,7 +27,7 @@ jobs:
             const regexPattern = /version: "(\d+\.\d+\.\d+\s*(.*))?"/;
 
             const match = fileContent.match(regexPattern);
-            console.log('count: ' + match.length);
+            console.log('count: ' + match);
             console.log('first match: ' + match[1]);
             const versionName = match ? match[1] : null;
             const prefixedVersionName = versionName ? `v${versionName}` : null;
